@@ -10,14 +10,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class StepFinder {
-	private static final Pattern GLUE_ANNOTATION_PATTERN = Pattern.compile("@(Given|When|Then)\\(\".*\"\\)");
+	private static final Pattern GLUE_ANNOTATION_PATTERN = Pattern.compile("@(Given|When|Then)\\(\"(.*)\"\\)");
 
 	public static final Stream<StepDefinition> findStepsInLines(final Path path, final Iterable<String> lines) {
 		final List<StepDefinition> results = new ArrayList<>();
 		int lineNumber = 1;
 		for (final String l : lines) {
 			final Matcher matcher = GLUE_ANNOTATION_PATTERN.matcher(l);
-			if (matcher.matches()) {
+			if (matcher.matches() && matcher.groupCount() == 2) {
 				results.add(new StepDefinition(matcher.group(2), path, lineNumber));
 			}
 			lineNumber += 1;

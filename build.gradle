@@ -8,4 +8,5 @@ repositories {
 dependencies {
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'org.javatuples:javatuples:1.2'
+    compile 'org.zeromq:jeromq:0.4.2'
 }
