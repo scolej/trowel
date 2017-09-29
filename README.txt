@@ -12,7 +12,7 @@ The most important thing for a new repo...
        \__\/    \  \:\        \  \::/       \  \::/       \  \::/        \__\/
                  \__\/         \__\/         \__\/         \__\/
 
-The goal of Trowl is to be a tiny tool for looking up Cucumber
+The goal of Trowel is to be a tiny tool for looking up Cucumber
 step definitions.
 
 Trowel will scan a directory tree for glue in Java files. You then send
