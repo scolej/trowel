@@ -18,7 +18,9 @@ public class StepFinder {
 		for (final String l : lines) {
 			final Matcher matcher = GLUE_ANNOTATION_PATTERN.matcher(l);
 			if (matcher.matches() && matcher.groupCount() == 2) {
-				results.add(new StepDefinition(matcher.group(2), path, lineNumber));
+				final String raw = matcher.group(2);
+				final String escaped = raw.replace("\\\\", "\\");
+				StepDefinition.of(escaped, path, lineNumber).ifPresent(results::add);
 			}
 			lineNumber += 1;
 		}
