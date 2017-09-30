@@ -68,4 +68,5 @@
       (test-response {:action "lookup"
                       :stepText "where are the penguins?"}
                      {:matches []})
-      (finally (. p destroy)))))
+      (finally (. p destroy))))
+  (System/exit 0))
