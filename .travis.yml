@@ -1,7 +1,4 @@
 language: java
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install clojure
 jdk:
   - openjdk8
 script:
