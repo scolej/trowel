@@ -1,13 +1,11 @@
-matrix:
-  include:
-    - language: java
-      jdk:
-        - oraclejdk8
-        - openjdk8
-      script:
-        - gradle installDist
-    - language: clojure
-      before_script:
-        - cd int-tests
-      script:
-        - lein run
+language: java
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install clojure
+jdk:
+  - openjdk8
+script:
+  - gradle installDist
+  - cd int-tests
+  - curl 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein' > lein
+  - sh lein run
