@@ -1,6 +1,6 @@
 # Trowel
 
-![Master branch build status](https://travis-ci.org/scolej/trowel.svg?branch=master)
+[![Build Status](https://travis-ci.org/scolej/trowel.svg?branch=master)](https://travis-ci.org/scolej/trowel)
 
 Trowel is a tiny service for looking up the Java glue code for
 Cucumber steps. It scans a directory hierarchy containing Java glue
@@ -24,7 +24,6 @@ Trowel responds:
 - Caching. Trowel should not re-scan the whole hierarchy every time.
 - Invalidate-cache request, to force a re-scan of the glue hierarchy.
 - Handle keywords properly. Trowel should be able to identify and
-  strip away the keyword from the step text.
-- An Elisp function for making requests and jumping to the identified
-  location.
+  strip away the keyword from the step text. Currently the Elisp has
+  absorbed this.
 - Code coverage from Clojure tests.
