@@ -1,0 +1,21 @@
+(require 'json)
+
+(defun request-step-location (step-text)
+  ((let* (response (let ((url-request-method "POST")
+                         (url-request-extra-headers `(("Content-Type" . "application/json")))
+                         (url-request-data (json-encode `(:action "lookup" :stepText ,step-text))))
+                     (with-current-buffer (url-retrieve-synchronously "http://127.0.0.1:5555")
+                       (let ((json-object-type 'plist))
+                         (json-read-from-string (buffer-substring (+ url-http-end-of-headers 1) (point-max)))))))
+     (plist-get response :matches))))
+
+(defun jump-to-step-definition (step-text)
+  (let ((r (request-step-location step-text)))
+    (cond ((= 0 (length r)) (message (format "Step not found: %s" step-text)))
+          ((> 0 (length r)) (message (format "More than one match found.")))
+          (t (let* ((m (elt r 0))
+                    (file (plist-get m :file))
+                    (lineNumber (plist-get m :lineNumber)))
+               (start-process "eclipse" nil "eclipse" (format "%s+%s" file lineNumber)))))))
+
+(jump-to-step-definition "I have a thing.")
