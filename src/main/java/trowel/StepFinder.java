@@ -20,7 +20,7 @@ public class StepFinder {
 			if (matcher.matches() && matcher.groupCount() == 2) {
 				final String raw = matcher.group(2);
 				final String escaped = raw.replace("\\\\", "\\");
-				StepDefinition.of(escaped, path, lineNumber).ifPresent(results::add);
+				StepDefinition.of(escaped, path.toAbsolutePath().normalize(), lineNumber).ifPresent(results::add);
 			}
 			lineNumber += 1;
 		}

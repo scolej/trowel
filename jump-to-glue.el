@@ -11,11 +11,11 @@
 
 (defun jump-to-step-definition (step-text)
   (let ((r (request-step-location step-text)))
-    (cond ((= 0 (length r)) (message (format "Step not found: %s" step-text)))
-          ((> 0 (length r)) (message (format "More than one match found.")))
+    (cond ((= 0 (length r)) (message "Step not found: %s" step-text))
+          ((> 0 (length r)) (message "More than one match found."))
           (t (let* ((m (elt r 0))
                     (file (plist-get m :file))
                     (lineNumber (plist-get m :lineNumber)))
                (start-process "eclipse" nil "eclipse" (format "%s+%s" file lineNumber)))))))
 
-(jump-to-step-definition "I have a thing.")
+(jump-to-step-definition "the cat is on the ROOF")
