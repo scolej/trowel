@@ -3,13 +3,17 @@ package trowel;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
-import java.util.stream.Stream;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,8 +25,27 @@ import trowel.json.Request;
 
 public class Main extends NanoHTTPD {
 
+	private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+
 	public static void main(final String[] args) throws IOException {
+		LogManager.getLogManager().readConfiguration(ClassLoader.class.getResourceAsStream("/logging.properties"));
+		printStartupBuildInfo();
 		new Main();
+	}
+
+	private static void printStartupBuildInfo() {
+		final Properties prop = new Properties();
+
+		try (InputStream in = ClassLoader.class.getResourceAsStream("/build.properties")) {
+			prop.load(in);
+		} catch (final IOException | NullPointerException e) {
+			e.printStackTrace();
+			Thread.interrupted();
+		}
+
+		LOGGER.info(String.join(System.lineSeparator(), "Starting Trowel!",
+				"Built at: " + prop.getProperty("buildDate", "?"),
+				"From commit: " + prop.getProperty("commitHash", "?")));
 	}
 
 	public Main() throws IOException {
@@ -37,7 +60,7 @@ public class Main extends NanoHTTPD {
 			final Map<String, String> map = new HashMap<String, String>();
 			session.parseBody(map);
 			final String requestJson = map.get("postData");
-			System.out.println("Received: " + requestJson);
+			LOGGER.info("Received: " + requestJson);
 
 			final Gson gson = new GsonBuilder().create();
 			final Request request = gson.fromJson(requestJson, Request.class);
@@ -45,8 +68,11 @@ public class Main extends NanoHTTPD {
 			final Reply reply;
 			if ("lookup".equals(request.action)) {
 
-				final Stream<StepDefinition> glue = StepFinder.findStepsInTree(Paths.get("."));
-				final List<StepDefinition> matches = glue.filter(g -> {
+				final Path searchPath = Paths.get(".").toAbsolutePath().normalize();
+				final List<StepDefinition> glue = StepFinder.findStepsInTree(searchPath).collect(toList());
+				LOGGER.info("Found " + glue.size() + " definitions under directory " + searchPath);
+
+				final List<StepDefinition> matches = glue.stream().filter(g -> {
 					final Matcher m = g.pattern().matcher(request.stepText);
 					return m.matches();
 				}).collect(toList());
@@ -58,7 +84,7 @@ public class Main extends NanoHTTPD {
 			}
 
 			final String json = gson.toJson(reply);
-			System.out.println("Replied " + ": " + json);
+			LOGGER.info("Replied " + ": " + json);
 			return newFixedLengthResponse(json + "\n");
 
 		} catch (final IOException | ResponseException e) {

@@ -23,7 +23,18 @@ Trowel responds:
 
 - Caching. Trowel should not re-scan the whole hierarchy every time.
 - Invalidate-cache request, to force a re-scan of the glue hierarchy.
+
 - Handle keywords properly. Trowel should be able to identify and
   strip away the keyword from the step text. Currently the Elisp has
   absorbed this.
+
 - Code coverage from Clojure tests.
+- Use proper testing suite for the Clojure tests.
+- Integrate the Gradle and Clojure builds so that it's not necessary
+  to manually `gradle installDist` before running Clojure tests.
+
+- Support requests which contain the whole `Scenario`, `Scenario
+  Outline` or maybe even the whole file, to address GH-2. Could use
+  the real Gherkin parser for this too.
+- Need to be able to send a glue root argument so the same instance of
+  Trowel can be used on different projects simultaneously.

@@ -10,7 +10,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class StepFinder {
-	private static final Pattern GLUE_ANNOTATION_PATTERN = Pattern.compile("@(Given|When|Then)\\(\"(.*)\"\\)");
+	private static final Pattern GLUE_ANNOTATION_PATTERN = Pattern
+			.compile("^\\p{Blank}*@(Given|When|Then)\\(\"(.*)\"\\).*$");
 
 	public static final Stream<StepDefinition> findStepsInLines(final Path path, final Iterable<String> lines) {
 		final List<StepDefinition> results = new ArrayList<>();

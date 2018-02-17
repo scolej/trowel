@@ -1,3 +1,6 @@
+import java.time.Instant
+import java.nio.file.Paths
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'jacoco'
@@ -7,6 +10,10 @@ repositories {
     mavenCentral()
 }
 
+wrapper {
+    gradleVersion = '4.5'
+}
+
 dependencies {
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'org.javatuples:javatuples:1.2'
@@ -14,3 +21,27 @@ dependencies {
 }
 
 mainClassName = 'trowel.Main'
+
+sourceSets {
+    main {
+        resources {
+            srcDirs 'src/gen/resources'
+        }
+    }
+}
+
+task generateBuildInfo {
+    outputs.upToDateWhen { false }
+    doLast {
+        def commitHash = 'git rev-parse HEAD'.execute().text
+        def currentTime = Instant.now().toString()
+        File propertiesFile = Paths.get('src', 'gen', 'resources', 'build.properties').toFile()
+        propertiesFile.getParentFile().mkdirs()
+        propertiesFile.withWriter() { out ->
+            out.println "commitHash=$commitHash"
+            out.println "buildDate=$currentTime"
+        }
+    }
+}
+
+assemble.dependsOn 'generateBuildInfo'
