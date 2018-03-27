@@ -1,7 +1,7 @@
 import java.time.Instant
 import java.nio.file.Paths
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'jacoco'
 apply plugin: 'application'
@@ -11,13 +11,15 @@ repositories {
 }
 
 wrapper {
-    gradleVersion = '4.5'
+    gradleVersion = '4.6'
 }
 
 dependencies {
-    compile 'com.google.code.gson:gson:2.8.2'
-    compile 'org.javatuples:javatuples:1.2'
-    compile 'org.nanohttpd:nanohttpd:2.3.1'
+    implementation(
+        'com.google.code.gson:gson:2.8.2',
+        'org.javatuples:javatuples:1.2',
+        'org.nanohttpd:nanohttpd:2.3.1',
+    )
 }
 
 mainClassName = 'trowel.Main'
@@ -31,11 +33,12 @@ sourceSets {
 }
 
 task generateBuildInfo {
+    File propertiesFile = file('src/gen/resources/build.properties')
     outputs.upToDateWhen { false }
+    outputs.file propertiesFile
     doLast {
         def commitHash = 'git rev-parse HEAD'.execute().text
         def currentTime = Instant.now().toString()
-        File propertiesFile = Paths.get('src', 'gen', 'resources', 'build.properties').toFile()
         propertiesFile.getParentFile().mkdirs()
         propertiesFile.withWriter() { out ->
             out.println "commitHash=$commitHash"
