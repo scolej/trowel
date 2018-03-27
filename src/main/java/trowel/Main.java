@@ -68,7 +68,7 @@ public class Main extends NanoHTTPD {
 			final Reply reply;
 			if ("lookup".equals(request.action)) {
 
-				final Path searchPath = Paths.get(".").toAbsolutePath().normalize();
+				final Path searchPath = Paths.get(request.rootDir);
 				final List<StepDefinition> glue = StepFinder.findStepsInTree(searchPath).collect(toList());
 				LOGGER.info("Found " + glue.size() + " definitions under directory " + searchPath);
 

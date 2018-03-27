@@ -27,6 +27,11 @@
                      "  Actual:   " reply-json)
             (throw (AssertionError.))))))
 
+(defn build-default-lookup [step-text]
+  {:rootDir "testing-ground"
+   :action "lookup"
+   :stepText step-text})
+
 (defn run-tests []
   (let [p (. (Runtime/getRuntime) exec trowel-bin)
         r (clojure.java.io/reader (. p getInputStream))
@@ -35,44 +40,50 @@
     ;; Sleep to let the server start up. TODO Something better than this.
     (Thread/sleep 1000)
     (try
-      (test-response {:action "lookup"
-                      :stepText "I have a thing."}
+      (test-response (build-default-lookup "I have a thing.")
                      {:matches [{:file (abs-path "testing-ground/Glue.java")
                                  :lineNumber 2}
                                 {:file (abs-path "testing-ground/Glue.java")
                                  :lineNumber 5}]})
-      (test-response {:action "lookup"
-                      :stepText "I do a thing."}
+      (test-response (build-default-lookup "I do a thing.")
                      {:matches [{:file (abs-path "testing-ground/Glue.java")
                                  :lineNumber 5}]})
-      (test-response {:action "lookup"
-                      :stepText "I give a thing."}
+      (test-response (build-default-lookup "I give a thing.")
                      {:matches [{:file (abs-path "testing-ground/Glue.java")
                                  :lineNumber 5}]})
-      (test-response {:action "lookup"
-                      :stepText "(parens for trouble)"}
+      (test-response (build-default-lookup "(parens for trouble)")
                      {:matches [{:file (abs-path "testing-ground/Glue.java")
                                  :lineNumber 8}]})
-      (test-response {:action "lookup"
-                      :stepText "\"quotes for trouble\""}
+      (test-response (build-default-lookup "\"quotes for trouble\"")
                      {:matches [{:file (abs-path "testing-ground/Glue.java")
                                  :lineNumber 11}]})
-      (test-response {:action "lookup"
-                      :stepText "\\backslashes for trouble\\"}
+      (test-response (build-default-lookup "\\backslashes for trouble\\")
                      {:matches [{:file (abs-path "testing-ground/Glue.java")
                                  :lineNumber 14}]})
-      (test-response {:action "lookup"
-                      :stepText "the dog is on the couch"}
+      (test-response (build-default-lookup "the dog is on the couch")
                      {:matches [{:file (abs-path "testing-ground/Glue.java")
                                  :lineNumber 17}]})
-      (test-response {:action "lookup"
-                      :stepText "the cat is on the ROOF"}
+      (test-response (build-default-lookup "the cat is on the ROOF")
                      {:matches [{:file (abs-path "testing-ground/Glue.java")
                                  :lineNumber 20}]})
-      (test-response {:action "lookup"
-                      :stepText "where are the penguins?"}
+      (test-response (build-default-lookup "where are the penguins?")
                      {:matches []})
-      (finally (. p destroy)))))
+      (test-response (build-default-lookup "some sticky glue from another town...")
+                     {:matches []})
+      (test-response {:rootDir "proving-ground"
+                      :action "lookup"
+                      :stepText "some sticky glue from another town..."}
+                     {:matches [{:file (abs-path "proving-ground/nest-for-trouble/Glue2.java")
+                                 :lineNumber 2}]})
+      ;; TODO Some error cases.
+      ;; Example: rootDir not defined, missing action / steptext
+      ;; Also FIXME stepText and lookup have mis-matched casing schemes.
+      ;; (test-response {:action "lookup"
+      ;;                 :stepText "anythung"}
+      ;;                {:matches []})
+      (finally
+        (. p destroy)
+        (shutdown-agents)))))
 
 (defn -main
   [& args]
