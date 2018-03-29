@@ -1,7 +1,9 @@
 (require 'json)
+(require 's)
 
 (defvar glue-roots
-  '("/home/sjc/everything/trowel/"))
+  ""
+  '())
 
 (defun trowel-request (json-plist)
   (let ((url-request-method "POST")
@@ -12,8 +14,15 @@
         (let ((json-object-type 'plist))
           (json-read-from-string (buffer-substring (+ url-http-end-of-headers 1) (point-max))))))))
 
+(defun select-appropriate-glue-root (file-path)
+  (cdr
+   (seq-find (lambda (pair)
+               ;; Case sensitivity :(
+               (s-prefix? (car pair) file-path))
+             glue-roots)))
+
 (defun request-step-location (file-path step-text)
-  (let* ((root ())
+  (let* ((root (select-appropriate-glue-root file-path))
          (response (trowel-request `(:rootDir ,root :action "lookup" :stepText ,step-text))))
     (plist-get response :matches)))
 
@@ -34,13 +43,4 @@
          (trim-line (s-trim whole-line))
          (first-space (seq-position trim-line ?\s))
          (step-text (substring trim-line (+ 1 first-space))))
-    (do-jump-to-step-definition step-text)))
-
-(defun file-is-child-p (parent child)
-  "Test if CHILD is a sub-file or directory of PARENT."
-  (unless (directory-name-p parent) (error "Parent should be a directory."))
-  (let ((child-parent (file-name-directory (directory-file-name child))))
-    (cond ((null child-parent) nil)
-          ((equal child-parent "/") nil)
-          ((equal parent child-parent) t)
-          (t (file-is-child-p parent child-parent)))))
+    (do-jump-to-step-definition (buffer-file-name) step-text)))
