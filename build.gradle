@@ -1,10 +1,13 @@
 import java.time.Instant
 import java.nio.file.Paths
 
-apply plugin: 'java-library'
-apply plugin: 'eclipse'
-apply plugin: 'jacoco'
-apply plugin: 'application'
+plugins {
+    id 'com.github.sherter.google-java-format' version '0.6'
+    id 'java-library'
+    id 'eclipse'
+    id 'jacoco'
+    id 'application'
+}
 
 repositories {
     mavenCentral()
